@@ -15,7 +15,20 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-
+import { Formik } from 'formik'
+import * as yup from 'yup'
+const validateSchema = yup.object({
+  email: yup
+    .string()
+    .min(11, 'نام کاربری شما باید 11 کاراکتر باشد')
+    .max(11, 'نام کاربری شما نباید بیشتر از 11 کاراکتر باشد')
+    .required(),
+  password: yup
+    .string()
+    .min(6, 'رمز عبور باید بیشتر از 6 کاراکتر باشد')
+    .max(30, 'رمز عبور باید کمتر از 30 کاراکتر باشد')
+    .required(),
+})
 const Login = () => {
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
@@ -25,47 +38,83 @@ const Login = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm>
-                    <h1>پنل مدیریت فروشگاه</h1>
-                    <p className="text-medium-emphasis">به حساب کاربری خود وارد شوید</p>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupText>
-                        <CIcon icon={cilUser} />
-                      </CInputGroupText>
-                      <CFormInput placeholder="تلفن همراه" autoComplete="username" />
-                    </CInputGroup>
-                    <CInputGroup className="mb-4">
-                      <CInputGroupText>
-                        <CIcon icon={cilLockLocked} />
-                      </CInputGroupText>
-                      <CFormInput
-                        type="password"
-                        placeholder="کلمه عبور"
-                        autoComplete="current-password"
-                      />
-                    </CInputGroup>
-                    <CRow>
-                      <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
-                          ورود
-                        </CButton>
-                      </CCol>
-                    </CRow>
-                  </CForm>
+                  <Formik
+                    initialValues={{ email: '', password: '' }}
+                    validationSchema={validateSchema}
+                    onSubmit={(values, { setSubmitting }) => {
+                      setTimeout(() => {
+                        alert(JSON.stringify(values, null, 2))
+                        setSubmitting(false)
+                      }, 400)
+                    }}
+                  >
+                    {({
+                      values,
+                      errors,
+                      touched,
+                      handleChange,
+                      handleBlur,
+                      handleSubmit,
+                      isSubmitting,
+                      /* and other goodies */
+                    }) => (
+                      <CForm>
+                        <h4>پنل مدیریت فروشگاه</h4>
+                        <p className="text-medium-emphasis">به حساب کاربری خود وارد شوید</p>
+                        <CInputGroup className="mb-3">
+                          <CInputGroupText>
+                            <CIcon icon={cilUser} />
+                          </CInputGroupText>
+                          <CFormInput
+                            placeholder="شماره همراه"
+                            autoComplete="username"
+                            type="text"
+                            name="email"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.email}
+                          />
+                        </CInputGroup>
+                        {errors.email && touched.email && errors.email}
+                        <CInputGroup className="mb-4">
+                          <CInputGroupText>
+                            <CIcon icon={cilLockLocked} />
+                          </CInputGroupText>
+                          <CFormInput
+                            type="password"
+                            placeholder="کلمه عبور"
+                            autoComplete="current-password"
+                            name="password"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.password}
+                          />
+                        </CInputGroup>
+                        {errors.password && touched.password && errors.password}
+                        <CRow>
+                          <CCol xs={6}>
+                            <CButton color="primary" className="px-4">
+                              ورود
+                            </CButton>
+                          </CCol>
+                        </CRow>
+                      </CForm>
+                    )}
+                  </Formik>
                 </CCardBody>
               </CCard>
               <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
                 <CCardBody className="text-center">
                   <div>
-                    <h2>طراحی اپلیکیشن فروشگاهی مشابه دیجی کالا</h2>
+                    <h5>طراحی اپلیکیشن فروشگاهی مشابه دیجی کالا</h5>
                     <hr />
-                    <h2>ساخت توسعه اپلیکیشن با React Native</h2>
+                    <h5>ساخت توسعه اپلیکیشن با React Native</h5>
                     <hr />
-                    <h2>توسعه پنل مدیریت با React JS</h2>
+                    <h5>توسعه پنل مدیریت با React JS</h5>
                     <hr />
-                    <h2>ساخت توسعه اپلیکیشن با React Native</h2>
+                    <h5>ساخت توسعه اپلیکیشن با React Native</h5>
                     <hr />
-                    <h2>توسعه API با استفاده از GraphQL و NodeJS</h2>
+                    <h5>توسعه API با استفاده از GraphQL و NodeJS</h5>
                     <Link to="/register">
                       <CButton color="primary" className="mt-3" active tabIndex={-1}>
                         ثبت نام
