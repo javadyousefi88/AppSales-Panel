@@ -17,8 +17,8 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { Formik } from 'formik'
 import * as yup from 'yup'
-const validateSchema = yup.object({
-  email: yup
+const validateSchema = yup.object().shape({
+  userName: yup
     .string()
     .min(11, 'نام کاربری شما باید 11 کاراکتر باشد')
     .max(11, 'نام کاربری شما نباید بیشتر از 11 کاراکتر باشد')
@@ -39,7 +39,7 @@ const Login = () => {
               <CCard className="p-4">
                 <CCardBody>
                   <Formik
-                    initialValues={{ email: '', password: '' }}
+                    initialValues={{ userName: '', password: '' }}
                     validationSchema={validateSchema}
                     onSubmit={(values, { setSubmitting }) => {
                       setTimeout(() => {
@@ -58,7 +58,7 @@ const Login = () => {
                       isSubmitting,
                       /* and other goodies */
                     }) => (
-                      <CForm>
+                      <CForm onSubmit={handleSubmit}>
                         <h4>پنل مدیریت فروشگاه</h4>
                         <p className="text-medium-emphasis">به حساب کاربری خود وارد شوید</p>
                         <CInputGroup className="mb-3">
@@ -69,13 +69,13 @@ const Login = () => {
                             placeholder="شماره همراه"
                             autoComplete="username"
                             type="text"
-                            name="email"
+                            name="userName"
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            value={values.email}
+                            value={values.userName}
                           />
                         </CInputGroup>
-                        {errors.email && touched.email && errors.email}
+                        {errors.userName && touched.userName && errors.userName}
                         <CInputGroup className="mb-4">
                           <CInputGroupText>
                             <CIcon icon={cilLockLocked} />
@@ -93,7 +93,12 @@ const Login = () => {
                         {errors.password && touched.password && errors.password}
                         <CRow>
                           <CCol xs={6}>
-                            <CButton color="primary" className="px-4">
+                            <CButton
+                              color="primary"
+                              className="px-4"
+                              type="submit"
+                              disabled={isSubmitting}
+                            >
                               ورود
                             </CButton>
                           </CCol>
@@ -130,5 +135,4 @@ const Login = () => {
     </div>
   )
 }
-
 export default Login
