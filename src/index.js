@@ -6,7 +6,9 @@ import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { Provider } from 'react-redux'
 import store from './store'
-
+import axios from 'axios'
+axios.defaults.baseURL = 'https://digikala.liara.run/graphql'
+axios.defaults.headers.post['Accept'] = 'application/json'
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <App />

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   CButton,
@@ -12,11 +12,13 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
+  CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { Formik } from 'formik'
 import * as yup from 'yup'
+import axios from 'axios'
 const validateSchema = yup.object().shape({
   userName: yup
     .string()
@@ -30,6 +32,9 @@ const validateSchema = yup.object().shape({
     .required(),
 })
 const Login = () => {
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [acceptLogin, setAcceptLogin] = useState(false)
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -41,11 +46,37 @@ const Login = () => {
                   <Formik
                     initialValues={{ userName: '', password: '' }}
                     validationSchema={validateSchema}
-                    onSubmit={(values, { setSubmitting }) => {
-                      setTimeout(() => {
-                        alert(JSON.stringify(values, null, 2))
-                        setSubmitting(false)
-                      }, 400)
+                    onSubmit={(values, { setSubmitting, resetForm }) => {
+                      setLoading(true)
+                      axios({
+                        url: '/',
+                        method: 'post',
+                        data: {
+                          query: `query{
+                            login(input : { phone : "${values.userName}", password : "${values.password}"}){
+                              token
+                            }
+                          }`,
+                        },
+                      })
+                        .then((response) => {
+                          setLoading(false)
+                          if (response.data.errors) {
+                            const { message } = response.data.errors[0]
+                            setMessage(message)
+                            setSubmitting(false)
+                            setAcceptLogin(false)
+                            resetForm()
+                          } else {
+                            const { token } = response.data.data.login
+                            console.log(token)
+                            setSubmitting(false)
+                            setAcceptLogin(true)
+                          }
+                        })
+                        .catch((error) => {
+                          console.log(error)
+                        })
                     }}
                   >
                     {({
@@ -61,6 +92,11 @@ const Login = () => {
                       <CForm onSubmit={handleSubmit}>
                         <h4>پنل مدیریت فروشگاه</h4>
                         <p className="text-medium-emphasis">به حساب کاربری خود وارد شوید</p>
+                        {acceptLogin ? (
+                          <div style={{ margin: '10px', color: 'red' }}></div>
+                        ) : (
+                          <div style={{ margin: '10px', color: 'red' }}>{message}</div>
+                        )}
                         <CInputGroup className="mb-3">
                           <CInputGroupText>
                             <CIcon icon={cilUser} />
@@ -75,7 +111,9 @@ const Login = () => {
                             value={values.userName}
                           />
                         </CInputGroup>
-                        {errors.userName && touched.userName && errors.userName}
+                        <div style={{ margin: '10px', color: 'red' }}>
+                          {errors.userName && touched.userName && errors.userName}
+                        </div>
                         <CInputGroup className="mb-4">
                           <CInputGroupText>
                             <CIcon icon={cilLockLocked} />
@@ -90,7 +128,9 @@ const Login = () => {
                             value={values.password}
                           />
                         </CInputGroup>
-                        {errors.password && touched.password && errors.password}
+                        <div style={{ margin: '10px', color: 'red' }}>
+                          {errors.password && touched.password && errors.password}
+                        </div>
                         <CRow>
                           <CCol xs={6}>
                             <CButton
@@ -99,7 +139,7 @@ const Login = () => {
                               type="submit"
                               disabled={isSubmitting}
                             >
-                              ورود
+                              {loading ? <CSpinner size="sm" /> : 'ورود'}
                             </CButton>
                           </CCol>
                         </CRow>
