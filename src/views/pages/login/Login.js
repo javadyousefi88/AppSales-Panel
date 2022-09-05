@@ -19,6 +19,7 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import { Formik } from 'formik'
 import * as yup from 'yup'
 import axios from 'axios'
+import Recaptcha from 'react-recaptcha'
 const validateSchema = yup.object().shape({
   userName: yup
     .string()
@@ -35,6 +36,12 @@ const Login = () => {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [acceptLogin, setAcceptLogin] = useState(false)
+  const [isVerified, setIsVerified] = useState(false)
+  const verifyCallback = (response) => {
+    if (response) {
+      setIsVerified(true)
+    }
+  }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -47,6 +54,10 @@ const Login = () => {
                     initialValues={{ userName: '', password: '' }}
                     validationSchema={validateSchema}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
+                      if (!isVerified) {
+                        setMessage('لطفا من ربات نیستم را تیک بزنید.')
+                        return false
+                      }
                       setLoading(true)
                       axios({
                         url: '/',
@@ -131,6 +142,14 @@ const Login = () => {
                         <div style={{ margin: '10px', color: 'red' }}>
                           {errors.password && touched.password && errors.password}
                         </div>
+                        <CInputGroup className="mb-4">
+                          <Recaptcha
+                            sitekey="6LdwGdMhAAAAAKx9v_KpAxQglqg-sBR2w_W4_dko"
+                            render="explicit"
+                            verifyCallback={verifyCallback}
+                            hl="fa"
+                          />
+                        </CInputGroup>
                         <CRow>
                           <CCol xs={6}>
                             <CButton
