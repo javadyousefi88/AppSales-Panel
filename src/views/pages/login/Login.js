@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   CButton,
@@ -20,6 +20,7 @@ import { Formik } from 'formik'
 import * as yup from 'yup'
 import axios from 'axios'
 import Recaptcha from 'react-recaptcha'
+import { AuthContext } from 'src/context/Auth/AuthContext'
 const validateSchema = yup.object().shape({
   userName: yup
     .string()
@@ -32,11 +33,12 @@ const validateSchema = yup.object().shape({
     .max(30, 'رمز عبور باید کمتر از 30 کاراکتر باشد')
     .required(),
 })
-const Login = () => {
+const Login = (props) => {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [acceptLogin, setAcceptLogin] = useState(false)
   const [isVerified, setIsVerified] = useState(false)
+  const { dispatch } = useContext(AuthContext)
   const verifyCallback = (response) => {
     if (response) {
       setIsVerified(true)
@@ -80,7 +82,7 @@ const Login = () => {
                             resetForm()
                           } else {
                             const { token } = response.data.data.login
-                            console.log(token)
+                            dispatch({ type: 'login', payload: token })
                             setSubmitting(false)
                             setAcceptLogin(true)
                           }
